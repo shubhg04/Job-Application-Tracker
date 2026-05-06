@@ -3,6 +3,19 @@ from datetime import datetime
 
 from backend.app.database import Base
 
+"""
+User(Base) → tells SQLAlchemy: “This class represents a table”
+
+SQLAlchemy registers this model internally
+
+Alembic reads this registered metadata
+
+Alembic generates migration file (CREATE TABLE users)
+
+You run: alembic upgrade head
+
+THAT is when PostgreSQL table is actually created
+"""
 
 class User(Base):
     __tablename__ = "users"

@@ -1,4 +1,5 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
@@ -8,13 +9,14 @@ from backend.app.schemas.user import (
     UserCreate,
     UserResponse,
     UserLogin,
-    TokenResponse,
+    TokenResponse
 )
 
 from backend.app.security import (
     hash_password,
     verify_password,
     create_access_token,
+    get_current_user
 )
 
 app = FastAPI()
@@ -57,14 +59,25 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
 
 
 @app.post("/login", response_model=TokenResponse)
-def login_user(user: UserLogin, db: Session = Depends(get_db)):
-    existing_user = db.query(User).filter(User.email == user.email).first()
+def login_user(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db)
+):
+    existing_user = db.query(User).filter(User.email == form_data.username).first()
 
     if not existing_user:
-        raise HTTPException(status_code=401, detail="Invalid email or password")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
-    if not verify_password(user.password, existing_user.hashed_password):
-        raise HTTPException(status_code=401, detail="Invalid email or password")
+    if not verify_password(form_data.password, existing_user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
     access_token = create_access_token(data={"sub": existing_user.email})
 
@@ -72,4 +85,8 @@ def login_user(user: UserLogin, db: Session = Depends(get_db)):
         "access_token": access_token,
         "token_type": "bearer"
     }
+
+@app.get("/me", response_model=UserResponse)
+def get_logged_in_user(current_user: User = Depends(get_current_user)):
+    return current_user
 
