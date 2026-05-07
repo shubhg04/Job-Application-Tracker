@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+from backend.app.routers import applications
 from backend.app.database import SessionLocal, get_db
 from backend.app.models.user import User
 from backend.app.schemas.user import (
@@ -35,6 +36,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(applications.router)
 
 
 @app.get("/")
