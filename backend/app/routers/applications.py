@@ -100,3 +100,27 @@ def delete_application(
     db.commit()
 
     return {"message": "Application deleted successfully"}
+
+
+@router.get("/dashboard/stats")
+def get_dashboard_stats(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    applications = db.query(Application).filter(
+        Application.user_id == current_user.id
+    ).all()
+
+    total = len(applications)
+
+    by_status = {}
+    for application in applications:
+        status = application.status
+        if status not in by_status:
+            by_status[status] = 0
+        by_status[status] += 1
+
+    return {
+        "total": total,
+        "by_status": by_status
+    }
