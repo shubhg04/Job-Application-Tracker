@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy.orm import relationship
 from datetime import datetime
 
 from backend.app.database import Base
@@ -25,3 +26,5 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     full_name = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+    applications = relationship("Application", back_populates="owner")
