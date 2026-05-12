@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+*.egg-info/
+
+
+# Environment variables — never ship these
+.env
+
+# Frontend — backend container doesn't need it
+frontend/
+node_modules/
+
+# Alembic local config — each developer has their own
+alembic.ini
+
+# Git
+.git/
+.gitignore
+
+# Editor
+.vscode/
+.DS_Store
