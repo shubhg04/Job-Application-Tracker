@@ -11,7 +11,7 @@ app = FastAPI()
 origins = [
     "http://localhost:5173",
     "http://localhost:3000",
-    "https://job-tracker-frontend.vercel.app",
+    "https://job-application-tracker-azure.vercel.app",
 ]
 
 app.add_middleware(
